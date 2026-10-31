@@ -65,6 +65,14 @@ public class IndexModel : PageModel
         BasketModel = await _basketViewModelService.Map(basket);
     }
 
+    public async Task OnPostRemove(int id)
+    {
+        var basketView = await _basketViewModelService.GetOrCreateBasketForUser(GetOrSetBasketCookieAndUserName());
+        var updateModel = new Dictionary<string, int> { { id.ToString(), 0 } };
+        var basket = await _basketService.SetQuantities(basketView.Id, updateModel);
+        BasketModel = await _basketViewModelService.Map(basket);
+    }
+
     private string GetOrSetBasketCookieAndUserName()
     {
         Guard.Against.Null(Request.HttpContext.User.Identity, nameof(Request.HttpContext.User.Identity));

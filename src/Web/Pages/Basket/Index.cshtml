@@ -39,6 +39,12 @@
                                 <input type="number" class="esh-basket-input" min="0" name="@("Items[" + i + "].Quantity")" value="@item.Quantity" />
                             </section>
                             <section class="esh-basket-item esh-basket-item--middle esh-basket-item--mark col-xs-2">$ @Math.Round(item.Quantity * item.UnitPrice, 2).ToString("N2")</section>
+                            <section class="esh-basket-item esh-basket-item--middle col-xs-1">
+                                <button class="btn esh-basket-checkout" type="submit"
+                                        asp-page-handler="Remove" asp-route-id="@item.Id">
+                                    [ Remove ]
+                                </button>
+                            </section>
                         </div>
                         <div class="row">
 
