@@ -58,6 +58,34 @@ public class IndexTest : IClassFixture<TestApplication>
     }
 
     [Fact]
+    public async Task OnPostRemoveEmptiesBasket()
+    {
+        var response = await Client.GetAsync("/", TestContext.Current.CancellationToken);
+        response.EnsureSuccessStatusCode();
+        var stringResponse1 = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        string token = WebPageHelpers.GetRequestVerificationToken(stringResponse1);
+
+        var keyValues = new List<KeyValuePair<string, string>>
+        {
+            new("id", "2"),
+            new("name", "shirt"),
+            new("__RequestVerificationToken", token)
+        };
+        var postResponse = await Client.PostAsync("/basket/index", new FormUrlEncodedContent(keyValues), TestContext.Current.CancellationToken);
+        postResponse.EnsureSuccessStatusCode();
+        var stringResponse = await postResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        Assert.Contains("[ Remove ]", stringResponse);
+
+        var removeKeyValues = new List<KeyValuePair<string, string>>
+        {
+            new(WebPageHelpers.TokenTag, WebPageHelpers.GetRequestVerificationToken(stringResponse))
+        };
+        var removeResponse = await Client.PostAsync("/basket/remove?id=" + WebPageHelpers.GetId(stringResponse), new FormUrlEncodedContent(removeKeyValues), TestContext.Current.CancellationToken);
+        var stringRemoveResponse = await removeResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        Assert.Contains("Basket is empty", stringRemoveResponse);
+    }
+
+    [Fact]
     public async Task OnPostUpdateTo0EmptyBasket()
     {
         // Load Home Page
